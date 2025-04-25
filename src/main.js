@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import { Player } from './player.js';
 
 // Define the vertices of the box
 const vertices = new Float32Array([
@@ -23,9 +23,10 @@ const indices = new Uint16Array([
   3, 2, 6, 3, 6, 7, // top face
   0, 1, 5, 0, 5, 4 // bottom face
 ]);
-    
 
-let curColor = 0;
+// Initialize the player
+let player;
+const clock = new THREE.Clock();
 
 let cameraSpeed = 0.2;
 let characterSpeed = 0.5;
@@ -91,9 +92,23 @@ scene.add(character);
 const axes = new THREE.AxesHelper(3); // The parameter is the length of the axes
 scene.add(axes);
 
+// Add a directional light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(5, 10, 7.5);
+scene.add(directionalLight);
+
+// Add ambient light for general illumination
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
 // Add OrbitControls
 //const controls = new OrbitControls(camera, renderer.domElement);
 //controls.listenToKeyEvents(window); // or document.body
+
+function initPlayer() {
+  player = new Player(scene, '../assets/test.glb');
+}
+initPlayer();
 
 function createPath(){
   for (let i = 0; i < path.length; i++) {
@@ -200,6 +215,13 @@ function animate() {
   requestAnimationFrame(animate);
   if (character.position.z > -5.0) {
     character.position.z -= 0.1;
+  }
+
+  const deltaTime = clock.getDelta();
+
+  // Update the player animations
+  if (player) {
+      player.update(deltaTime);
   }
   
   let playerPosZ = -Math.floor(character.position.z)
@@ -316,6 +338,13 @@ function updateCamera() {
 
     if (keys['r']) {
       camera.position.set(0,0,4);
+    }
+
+    if (keys['t']) {
+      player.playAnimation('Capoeira');
+    }
+    if (keys['z']) {
+      player.playAnimation('RumbaDancing');
     }
      // console.log('keys', keys)
 
