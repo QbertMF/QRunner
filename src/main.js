@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Player } from './player.js';
+import { Monster } from './monster.js';
 
 // Define the vertices of the box
 const vertices = new Float32Array([
@@ -26,6 +27,8 @@ const indices = new Uint16Array([
 
 // Initialize the player
 let player;
+let monster;
+let monster4
 const clock = new THREE.Clock();
 
 let cameraSpeed = 0.2;
@@ -106,9 +109,26 @@ scene.add(ambientLight);
 //controls.listenToKeyEvents(window); // or document.body
 
 function initPlayer() {
-  player = new Player(scene, '../assets/test.glb');
+  player = new Player(scene, '../assets/test.glb', 0.02);
 }
 initPlayer();
+
+function initMonster() {
+  monster4 = new Monster(scene, '../assets/monster4.gltf', 1.0, (model) => {
+    model.position.set(5, 0, -5);
+    model.rotation.set(-Math.PI/2, 0, 0);
+    console.log('Monster4 loaded');
+  });
+
+  monster = new Monster(scene, '../assets/monster3.gltf', 1.0, (model) => {
+    model.position.set(3, 0, -5); 
+    model.rotation.set(-Math.PI/2, 0, 0);
+    console.log('Monster loaded');
+  });
+}
+
+initMonster();
+
 
 function createPath(){
   for (let i = 0; i < path.length; i++) {
@@ -223,7 +243,14 @@ function animate() {
   if (player) {
       player.update(deltaTime);
   }
-  
+ 
+  if (monster) {
+    monster.update(deltaTime);
+  }
+  if (monster4) {
+    monster4.update(deltaTime);
+  }
+
   let playerPosZ = -Math.floor(character.position.z)
   //console.log(playerPosZ)
   if ((playerPosZ >= 0) && (playerPosZ < path.length)) {
